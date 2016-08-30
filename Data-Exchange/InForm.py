@@ -19,6 +19,8 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 from PyPDF2 import PdfFileReader,PdfFileWriter
 from PyPDF2.generic import NameObject, createStringObject
+from encryptfs import EncryptFS
+from encryptfs.encrypt_files import decrypt_file, encrypt_file, gen_key
 import os
 import datetime
 import json
@@ -33,24 +35,23 @@ import json
 
 class PdfBuilder():
 
-	def __init__ (self,lastname):
+	def __init__ (self,inpath,outpath,lastname):
 		print lastname
+		self.flash_directory=inpath
+		self.temp_directory=outpath
+		print self.flash_directory
 		self.filename=lastname+"_"+datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 		self.cwd=os.getcwd()
-		self.directory=self.cwd+"\pdffiles"
-		if not os.path.exists(self.directory):
-			os.makedirs(self.directory)
-		else:
-			print "path exist"
-
-		self.path=str(self.directory+"\\"+self.filename+'.pdf')
-		self.doc = SimpleDocTemplate(self.path,pagesize = letter)
-		self.story=[]
-		self.styles = getSampleStyleSheet()
-		self.styleN = self.styles['Normal']
-		self.styles.leading = 40
-		self.spacer=Spacer(0,0.2*inch)
-		
+		#self.directory=self.cwd+"\pdffiles"
+		if os.path.exists(self.flash_directory):
+			self.path=str(self.flash_directory+"\\"+self.filename+'.pdf')
+			self.doc = SimpleDocTemplate(self.path,pagesize = letter)
+			self.story=[]
+			self.styles = getSampleStyleSheet()
+			self.styleN = self.styles['Normal']
+			self.styles.leading = 40
+			self.spacer=Spacer(0,0.2*inch)
+			
 
 	def getDataList(self,data_list):
 		for data in data_list:
@@ -85,6 +86,19 @@ class PdfBuilder():
 			return True
 		else:
 		    return False
+		
+        def encrypt_decrypt_file_to_temp(self):
+               os.chdir(self.flash_directory)
+               self.encfs = EncryptFS('cool')
+               self.encfs.encrypt_all()
+               #os.chdir(self.flash_directory)
+              # self.encfs = EncryptFS('cool')
+               self.key=self.encfs.key
+               self.currentdir=self.encfs.current_dir
+               self.index=self.encfs.current_index
+               for file in self.index["files"]:
+                       decrypt_file(self.key, os.path.join(self.currentdir, file["filename_enc"]), out_filename=os.path.join(self.temp_directory, file["filename"]))
+                
 
 
 
@@ -94,10 +108,12 @@ class PdfBuilder():
 
 class pdfCreateFrame ( wx.Frame ):
 
-	def __init__( self, parent, MainFormFrame ):
+	def __init__( self, parent, MainFormFrame,inpath,outpath):
 		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Report of Physical or Mental Examination", pos = wx.DefaultPosition, size = wx.Size( 919,890 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 		self.json_build_data={}
 		self.MainForm=MainFormFrame
+		self.flash_directory=inpath
+		self.temp_directory=outpath
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INFOBK ) )
 		
@@ -1074,16 +1090,16 @@ class pdfCreateFrame ( wx.Frame ):
 		print self.yearspinCtrl.GetValue()
 		print self.genderChoiceBoxChoices[self.genderChoiceBox.GetSelection()]
 		event.Skip()
-		self.dataList.append([['<font size=12><b>First Name</b></font> ',self.firstNameTextCtrl.GetValue(),'<font size=12><b>Last Name</b></font> ',self.lastNameTxtCtrl.GetValue(),'<font size=12><b>Date of Birth</b></font> ',str(self.monthspinCtrl.GetValue())+" / "+str(self.datespinCtrl.GetValue())+" / "+str(self.yearspinCtrl.GetValue()),
-			'<font size=12><b>Gender</b></font> ',self.genderChoiceBoxChoices[self.genderChoiceBox.GetSelection()]]])
+		self.dataList.append([['<font size=12><b>First Name</b></font> ',"<font size=11>"+self.firstNameTextCtrl.GetValue()+"</font>",'<font size=12><b>Last Name</b></font> ',"<font size=11>"+self.lastNameTxtCtrl.GetValue()+"</font>",'<font size=12><b>Date of Birth</b></font> ',"<font size=11>"+str(self.monthspinCtrl.GetValue())+" / "+str(self.datespinCtrl.GetValue())+" / "+str(self.yearspinCtrl.GetValue())+"</font>",
+			'<font size=12><b>Gender</b></font> ',"<font size=11>"+self.genderChoiceBoxChoices[self.genderChoiceBox.GetSelection()]+"</font>"]])
 		#self.dataList.append([['']])
 		self.json_build_data["First Name".lower()]=self.firstNameTextCtrl.GetValue().lower()
 		self.json_build_data["Last Name".lower()]=self.lastNameTxtCtrl.GetValue().lower()
 		self.json_build_data["Date of Birth".lower()]=str(self.monthspinCtrl.GetValue())+" / "+str(self.datespinCtrl.GetValue())+" / "+str(self.yearspinCtrl.GetValue()).lower()
 		self.json_build_data["Gender".lower()]=self.genderChoiceBoxChoices[self.genderChoiceBox.GetSelection()].lower()
 		
-		self.dataList.append([['<font size=12><b>Street</b></font> ',self.streetTextCtrl.GetValue(),'<font size=12><b>City</b></font> ',self.cityTxtCtrl.GetValue(),
-			'<font size=12><b>State</b></font> ',self.stateTxtCtrl.GetValue(),'<font size=12><b>Zipcode</b></font> ',self.zipTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Street</b></font> ',"<font size=11>"+self.streetTextCtrl.GetValue()+"</font>",'<font size=12><b>City</b></font> ',"<font size=11>"+self.cityTxtCtrl.GetValue()+"</font>",
+			'<font size=12><b>State</b></font> ',"<font size=11>"+self.stateTxtCtrl.GetValue()+"</font>",'<font size=12><b>Zipcode</b></font> ',"<font size=11>"+self.zipTxtCtrl.GetValue()+"</font>"]])
 		#self.dataList.append([['']])
 		self.json_build_data["Street".lower()]=self.streetTextCtrl.GetValue().lower()
 		self.json_build_data["City".lower()]=self.cityTxtCtrl.GetValue().lower()
@@ -1091,17 +1107,17 @@ class pdfCreateFrame ( wx.Frame ):
 		self.json_build_data["Zipcode".lower()]=self.zipTxtCtrl.GetValue().lower()
 
 		
-		self.dataList.append([['<font size=12><b>Case Id</b></font> ',self.caseIdtxtCrl.GetValue(),'<font size=12><b>Category</b></font>',self.categoryTextCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Case Id</b></font> ',"<font size=11>"+self.caseIdtxtCrl.GetValue()+"</font>",'<font size=12><b>Category</b></font>',"<font size=11>"+self.categoryTextCtrl.GetValue()+"</font>"]])
 		self.dataList.append([['']])
-		self.dataList.append([['<font size=12><b>Entered By </b></font> ',self.enteredByTextCtrl.GetValue(),'<font size=12><b>Clinic Address </b></font> ',self.clinicAddressTxtCtrl.GetValue(),
-			'<font size=12><b>Physician Name </b></font> ',self.physicianNameTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Entered By </b></font> ',"<font size=11>"+self.enteredByTextCtrl.GetValue()+"</font>",'<font size=12><b>Clinic Address </b></font> ',"<font size=11>"+self.clinicAddressTxtCtrl.GetValue()+"</font>",
+			'<font size=12><b>Physician Name </b></font> ',"<font size=11>"+self.physicianNameTxtCtrl.GetValue()+"</font>"]])
 		#self.dataList.append([['']])
 		self.dataList.append([['']])
 		
 		#self.dataList.append([['']])
 		self.dataList.append([['<font size=12><b>TO BE COMPLETED BY EXAMINING PHYSICIAN</b></font>']])
 		#self.dataList.append([['']])
-		self.dataList.append([['<font size=12><b>Medical History</b></font> ',self.medicalHistoryTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Medical History</b></font> ',"<font size=11>"+self.medicalHistoryTxtCtrl.GetValue()+"</font>"]])
 		#self.dataList.append([['']])
 		self.json_build_data["Case Id".lower()]=self.caseIdtxtCrl.GetValue().lower()
 		self.json_build_data["Category".lower()]=self.categoryTextCtrl.GetValue().lower()
@@ -1115,10 +1131,10 @@ class pdfCreateFrame ( wx.Frame ):
 		self.json_build_data["Medical History".lower()]=self.medicalHistoryTxtCtrl.GetValue().lower()
 		
 
-		self.dataList.append([['<font size=12><b>Height</b></font> ',self.heightTxtCtrl.GetValue(),'<font size=12><b>Weight</b></font> ',self.weightTxtCtrl.GetValue(),
-		'<font size=12><b>Blood Pressure</b></font> ',self.bloodPressureTxtCtrl.GetValue()]])
-		self.dataList.append([['<font size=12><b>Pulse</b></font> ',self.pulseTxtCtrl.GetValue(),
-		'<font size=12><b>General Appearance</b></font> ',self.generalAppearanceTxtCtrl.GetValue(),'<font size=12><b>Head, Scalp</b></font> ',self.headScalpTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Height</b></font> ',"<font size=11>"+self.heightTxtCtrl.GetValue()+"</font>",'<font size=12><b>Weight</b></font> ',"<font size=11>"+self.weightTxtCtrl.GetValue()+"</font>",
+		'<font size=12><b>Blood Pressure</b></font> ',"<font size=11>"+self.bloodPressureTxtCtrl.GetValue()+"</font>"]])
+		self.dataList.append([['<font size=12><b>Pulse</b></font> ',"<font size=11>"+self.pulseTxtCtrl.GetValue()+"</font>",
+		'<font size=12><b>General Appearance</b></font> ',"<font size=11>"+self.generalAppearanceTxtCtrl.GetValue()+"</font>",'<font size=12><b>Head, Scalp</b></font> ',"<font size=11>"+self.headScalpTxtCtrl.GetValue()+"</font>"]])
 
 		self.json_build_data["Height".lower()]=self.heightTxtCtrl.GetValue().lower()
 		self.json_build_data["Weight".lower()]=self.weightTxtCtrl.GetValue().lower()
@@ -1129,10 +1145,10 @@ class pdfCreateFrame ( wx.Frame ):
 		
 		
 		#self.dataList.append([['']])
-		self.dataList.append([['<font size=12><b>Ears</b></font> ',self.earsTxtCtrl.GetValue(),'<font size=12><b>Hearing Left</b></font> ',self.hearingLeftTxtCtrl.GetValue(),
-		'<font size=12><b>Hearing Right</b></font> ',self.hearingRightTxtCtrl.GetValue()]])
-		self.dataList.append([['<font size=12><b>Nose</b></font> ',self.noseTxtCtrl.GetValue(),
-		'<font size=12><b>Throat</b></font> ',self.throatTxtCtrl.GetValue(),'<font size=12><b>Mouth</b></font> ',self.mouthTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Ears</b></font> ',"<font size=11>"+self.earsTxtCtrl.GetValue()+"</font>",'<font size=12><b>Hearing Left</b></font> ',"<font size=11>"+self.hearingLeftTxtCtrl.GetValue()+"</font>",
+		'<font size=12><b>Hearing Right</b></font> ',"<font size=11>"+self.hearingRightTxtCtrl.GetValue()+"</font>"]])
+		self.dataList.append([['<font size=12><b>Nose</b></font> ',"<font size=11>"+self.noseTxtCtrl.GetValue()+"</font>",
+		'<font size=12><b>Throat</b></font> ',"<font size=11>"+self.throatTxtCtrl.GetValue()+"</font>",'<font size=12><b>Mouth</b></font> ',"<font size=11>"+self.mouthTxtCtrl.GetValue()+"</font>"]])
 		self.dataList.append([['']])
 
 		self.json_build_data["Ears".lower()]=self.earsTxtCtrl.GetValue().lower()
@@ -1148,16 +1164,16 @@ class pdfCreateFrame ( wx.Frame ):
 		#self.dataList.append([['']])
 		self.dataList.append([['<font size=12><b>Visual Acuity </b></font>','<font size=12><b>Dist (20 ft.)</b></font>','<font size=12><b>Near (14 in.)</b></font>','<font size=12><b>Dist (20 ft.)</b></font>','<font size=12><b>Near (14 in.)</b></font>']])
 		#self.dataList.append([['']])
-		self.dataList.append([['<font size=12><b>RIGHT EYE</b></font></font>',self.rightEyeDistanceWithOutGlassesTxtCtrl.GetValue(),self.rightEyeNearWithOutGlassesTxtCtrl.GetValue(),
-			self.rightEyeDistanceWithGlassesTxtCtrl.GetValue(),self.rightEyeNearWithGlassesTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>RIGHT EYE</b></font></font>',"<font size=11>"+self.rightEyeDistanceWithOutGlassesTxtCtrl.GetValue()+"</font>","<font size=11>"+self.rightEyeNearWithOutGlassesTxtCtrl.GetValue()+"</font>",
+			"<font size=11>"+self.rightEyeDistanceWithGlassesTxtCtrl.GetValue()+"</font>","<font size=11>"+self.rightEyeNearWithGlassesTxtCtrl.GetValue()+"</font>"]])
 		#self.dataList.append([['']])
-		self.dataList.append([['<font size=12><b>LEFT EYE</b></font>',self.leftEyeDistanceWithOutGlassesTxtCtrl.GetValue(),self.leftEyeNearWithOutGlassesTxtCtrl.GetValue(),
-			self.leftEyeDistanceWithGlassesTxtCtrl.GetValue(),self.leftEyeNearWithGlassesTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>LEFT EYE</b></font>',"<font size=11>"+self.leftEyeDistanceWithOutGlassesTxtCtrl.GetValue()+"</font>","<font size=11>"+self.leftEyeNearWithOutGlassesTxtCtrl.GetValue()+"</font>"+"</font>",
+			"<font size=11>"+self.leftEyeDistanceWithGlassesTxtCtrl.GetValue()+"</font>","<font size=11>"+self.leftEyeNearWithGlassesTxtCtrl.GetValue()+"</font>"]])
 		#self.dataList.append([['']])
 		self.dataList.append([['<font size=12><b>Field of Vision</b></font>']])
 		#self.dataList.append([['']])
-		self.dataList.append([['<font size=12><b>Is there any limitation in the field of vision?</b></font> ','<font size=12><b>Right Eye:</b></font> ',str(self.righteyeCheckBox.GetValue()),
-		'<font size=12><b>Left Eye:</b></font> ',str(self.lefteyeCheckBox.GetValue())]])
+		self.dataList.append([['<font size=12><b>Is there any limitation in the field of vision?</b></font> ','<font size=12><b>Right Eye:</b></font> ',"<font size=11>"+str(self.righteyeCheckBox.GetValue())+"</font>",
+		'<font size=12><b>Left Eye:</b></font> ',"<font size=11>"+str(self.lefteyeCheckBox.GetValue())+"</font>"]])
 
 		#self.dataList.append([['']]) 
 		self.righteye_distance={"distance":{"with out glass":self.rightEyeDistanceWithOutGlassesTxtCtrl.GetValue().lower(),"with glass":self.rightEyeDistanceWithGlassesTxtCtrl.GetValue().lower()}}
@@ -1181,15 +1197,15 @@ class pdfCreateFrame ( wx.Frame ):
 
 
 
-		self.dataList.append([['<font size=12><b>Neck</b></font> ',self.neckTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Neck</b></font> ',"<font size=11>"+self.neckTxtCtrl.GetValue()+"</font>"]])
 		#self.dataList.append([['']])
-		self.dataList.append([['<font size=12><b>Chest</b></font> ',self.chestTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Chest</b></font> ',"<font size=11>"+self.chestTxtCtrl.GetValue()+"</font>"]])
 		#self.dataList.append([['']])
 		self.json_build_data["neck".lower()]=self.neckTxtCtrl.GetValue().lower()
 		self.json_build_data["Chest".lower()]=self.chestTxtCtrl.GetValue().lower()
 
 
-		self.dataList.append([['<font size=12><b>Cardio Vascular System</b></font> ',self.cardiovascularSystemTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Cardio Vascular System</b></font> ',"<font size=11>"+self.cardiovascularSystemTxtCtrl.GetValue()+"</font>"]])
 		#self.dataList.append([['']])
    
 		self.dataList.append([['<font size=12><b>Cardiac Status</b></font> ','<font size=12><b>Prognosis</b></font>']])
@@ -1245,11 +1261,11 @@ class pdfCreateFrame ( wx.Frame ):
 		#self.dataList.append([['']])
 
 
-		self.dataList.append([['<font size=12><b>Vascular System</b></font> ',self.vascularSystemTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Vascular System</b></font> ',"<font size=11>"+self.vascularSystemTxtCtrl.GetValue()+"</font>"]])
 		#self.dataList.append([['']])
-		self.dataList.append([['<font size=12><b>Gastro Intestinal</b></font> ',self.gastroIntestinalTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Gastro Intestinal</b></font> ',"<font size=11>"+self.gastroIntestinalTxtCtrl.GetValue()+"</font>"]])
 		#self.dataList.append([['']])
-		self.dataList.append([['<font size=12><b>Genitourinary</b></font> ',self.genitourinaryTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Genitourinary</b></font> ',"<font size=11>"+self.genitourinaryTxtCtrl.GetValue()+"</font>"]])
 
 		#self.dataList.append([['']])
 		self.json_build_data["Vascular System".lower()]=self.vascularSystemTxtCtrl.GetValue().lower()
@@ -1257,11 +1273,11 @@ class pdfCreateFrame ( wx.Frame ):
 		self.json_build_data["Genitourinary".lower()]=self.genitourinaryTxtCtrl.GetValue().lower()
 
 
-		self.dataList.append([['<font size=12><b>Hernia</b></font> ',self.herniaTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Hernia</b></font> ',"<font size=11>"+self.herniaTxtCtrl.GetValue()+"</font>"]])
 		#self.dataList.append([['']])
-		self.dataList.append([['<font size=12><b>Musculo Skeletal</b></font> ',self.musculoskeletalTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Musculo Skeletal</b></font> ',"<font size=11>"+self.musculoskeletalTxtCtrl.GetValue()+"</font>"]])
 		#self.dataList.append([['']])
-		self.dataList.append([['<font size=12><b>Neurological</b></font> ',self.neurologicalTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Neurological</b></font> ',"<font size=11>"+self.neurologicalTxtCtrl.GetValue()+"</font>"]])
 		#self.dataList.append([['']])
 		self.json_build_data["Hernia".lower()]=self.herniaTxtCtrl.GetValue().lower()
 		self.json_build_data["Musculo Skeletal".lower()]=self.musculoskeletalTxtCtrl.GetValue().lower()
@@ -1269,11 +1285,11 @@ class pdfCreateFrame ( wx.Frame ):
 		
 
 
-		self.dataList.append([['<font size=12><b>Skin</b></font> ',self.skinTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Skin</b></font> ',"<font size=11>"+self.skinTxtCtrl.GetValue()+"</font>"]])
 		#self.dataList.append([['']])
-		self.dataList.append([['<font size=12><b>Estimate of Mental Condition</b></font> ',self.estimateofMentalConditionTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Estimate of Mental Condition</b></font> ',"<font size=11>"+self.estimateofMentalConditionTxtCtrl.GetValue()+"</font>"]])
 		#self.dataList.append([['']])
-		self.dataList.append([['<font size=12><b>Diagnosis</b></font> ',self.diagnosisTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Diagnosis</b></font> ',"<font size=11>"+self.diagnosisTxtCtrl.GetValue()+"</font>"]])
 
 		#self.dataList.append([['']])
 		self.json_build_data["Skin".lower()]=self.skinTxtCtrl.GetValue().lower()
@@ -1281,9 +1297,9 @@ class pdfCreateFrame ( wx.Frame ):
 		self.json_build_data["Diagnosis".lower()]=self.diagnosisTxtCtrl.GetValue().lower()
 		
 
-		self.dataList.append([['<font size=12><b>Prognosis</b></font> ',self.prognosisTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Prognosis</b></font> ',"<font size=11>"+self.prognosisTxtCtrl.GetValue()+"</font>"]])
 		#self.dataList.append([['']])
-		self.dataList.append([['<font size=12><b>Vacination</b></font> ',self.vacinationTxtCtrl.GetValue()]])
+		self.dataList.append([['<font size=12><b>Vacination</b></font> ',"<font size=11>"+self.vacinationTxtCtrl.GetValue()+"</font>"]])
 		#self.dataList.append([['']])
 
 		self.json_build_data["Prognosis".lower()]=self.prognosisTxtCtrl.GetValue().lower()
@@ -1293,11 +1309,12 @@ class pdfCreateFrame ( wx.Frame ):
 
 
 
-		self.pdfBuilder=PdfBuilder(self.lastNameTxtCtrl.GetValue())
+		self.pdfBuilder=PdfBuilder(self.flash_directory, self.temp_directory,self.lastNameTxtCtrl.GetValue())
 		self.pdfBuilder.getDataList(self.dataList)
 		self.pdfBuilder.addMetadata(self.json_data)
 		if self.pdfBuilder.check_file_exists():
 			self.showMesssage("PDF Inserted")
+			self.pdfBuilder.encrypt_decrypt_file_to_temp()
 		else:
 			self.showMesssage("PDF Not Inserted")
 		print self.dataList

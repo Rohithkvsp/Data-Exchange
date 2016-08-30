@@ -1,13 +1,18 @@
-
 import wx
 import wx.xrc
 from wx.lib.pdfviewer import pdfViewer, pdfButtonPanel
-import os
+import os,stat
 from PyPDF2 import PdfFileReader,PdfFileWriter
 from PyPDF2.generic import NameObject, createStringObject
-import os
 import json
 from InForm import pdfCreateFrame
+from encryptfs import EncryptFS
+from encryptfs.encrypt_files import decrypt_file, encrypt_file, gen_key
+import win32con, win32api
+import shutil
+import tempfile
+import errno
+
 
 
 class PdfViewer(pdfViewer):
@@ -17,7 +22,9 @@ class PdfViewer(pdfViewer):
 		self.UsePrintDirect = ``False``
 
 	def openPdf(self,path):
-		self.LoadFile(path)
+	    self.LoadFile(path)
+
+	
 
 		
 class Tree(wx.TreeCtrl):
@@ -41,21 +48,42 @@ class Tree(wx.TreeCtrl):
 	def DeleteItems(self):
 		self.DeleteAllItems()
 
+		
+
 
 class LoadFiles():
-	def __init__(self):
+	def __init__(self,path):
+		#decrypt from flash to temp
 		self.pdfFiles=[]
 		self.pdfPaths=[]
 		self.cwd=os.getcwd()
-		self.directory=self.cwd+"\pdffiles"
-		if not os.path.exists(self.directory):
-			os.makedirs(self.directory)
-		else:
-			print "path exist"
-		for self.filename in os.listdir(self.directory):
-			if self.filename.endswith('.pdf'):
-				self.pdfPaths.append(os.path.join(self.directory,self.filename))
-				self.pdfFiles.append(self.filename)
+		#self.directory=self.cwd+"\pdffiles"
+                self.directory=path
+                print self.directory
+                if os.path.exists(self.directory):
+                        self.temp_path=tempfile.mkdtemp()
+                        print self.temp_path
+                        os.chdir(self.directory)
+                        self.encfs = EncryptFS('cool')
+                        self.key=self.encfs.key
+                        self.currentdir=self.encfs.current_dir
+                        self.index=self.encfs.current_index
+                        for file in self.index["files"]:
+                                decrypt_file(self.key, os.path.join(self.currentdir, file["filename_enc"]), out_filename=os.path.join(self.temp_path, file["filename"]))
+                        
+                        for self.filename in os.listdir(self.temp_path):
+							if self.filename.endswith('.pdf'):
+								self.pdfPaths.append(os.path.join(self.temp_path,self.filename))
+								self.pdfFiles.append(self.filename)
+
+
+	def update(self):
+		 self.pdfPaths=[]
+		 self.pdfFiles=[]
+		 for self.filename in os.listdir(self.temp_path):
+				if self.filename.endswith('.pdf'):
+					self.pdfPaths.append(os.path.join(self.temp_path,self.filename))
+					self.pdfFiles.append(self.filename)
 
 	def getFilesNameList(self):
 		return self.pdfFiles
@@ -65,12 +93,15 @@ class LoadFiles():
 
 
 
-
 class MainFormFrame ( wx.Frame ):
 	
-	def __init__( self, parent ):
+	def __init__( self, parent, directory ):
 		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 800,400 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
-		self.loadfiles=LoadFiles()
+		self.flashdir=directory
+		self.loadfiles=LoadFiles(directory)
+		self.tempdir=self.loadfiles.temp_path
+		self.fileobj=None
+		print self.tempdir
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 
 		self.menu = wx.MenuBar( 0 )
@@ -111,7 +142,7 @@ class MainFormFrame ( wx.Frame ):
 		bSizer2.Add( self.tree, 1, wx.ALL|wx.EXPAND, 5 )
 
 
-		self.searchCtrl = wx.SearchCtrl( self.leftpanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.searchCtrl = wx.SearchCtrl( self.leftpanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_PROCESS_ENTER)
 		self.searchCtrl.ShowSearchButton( True )
 		self.searchCtrl.ShowCancelButton( False )
 		bSizer2.Add( self.searchCtrl, 0, wx.ALL|wx.EXPAND, 5 )
@@ -152,18 +183,33 @@ class MainFormFrame ( wx.Frame ):
 
 		self.Bind( wx.EVT_MENU, self.newMenuItemSelected, id = self.newMenuItem.GetId() )
 		self.tree.Bind( wx.EVT_TREE_SEL_CHANGED, self.m_treeCtrl1ItemSelection )
-		self.searchCtrl.Bind( wx.EVT_SEARCHCTRL_SEARCH_BTN, self.searchButtonPressed )
-		#self.searchCtrl.Bind( wx.EVT_TEXT, self.textChanged )
-	
+		
+		#self.searchCtrl.Bind( wx.EVT_SEARCHCTRL_SEARCH_BTN, self.searchOnTextEnter )
+		self.searchCtrl.Bind( wx.EVT_TEXT_ENTER, self.searchOnTextEnter )
+		self.Bind( wx.EVT_CLOSE, self.frameClosed )
 	
 	
 
 	def __del__( self ):
 		pass
 
+	def frameClosed( self, event ):
+		#self.pdf_Viewer=None
+		#self.rightpanel.Destroy()
+		#os.chdir(self.tempdir)
+                #self.loadfiles.encfs.encrypt_all()
+                #os.chmod(self.tempdir, stat.S_IWRITE)
+                #print self.pdf_Viewer.have_file
+		#shutil.rmtree(self.tempdir)
+		if self.fileobj:
+		   self.fileobj.close()
+		shutil.rmtree(self.tempdir)
+		event.Skip()
+
+
 	def update_tree(self):
 		self.tree.DeleteItems()
-		self.loadfiles=LoadFiles()
+		self.loadfiles.update()
 		print "update_tree"
 		print self.loadfiles.getFilesNameList()
 		self.tree.add_root()
@@ -194,7 +240,10 @@ class MainFormFrame ( wx.Frame ):
 		if self.tree.GetItemData(self.item):
 			self.pdfFilePath=self.tree.GetItemData(self.item).GetData()
 			print self.pdfFilePath
-			self.pdf_Viewer.openPdf(self.pdfFilePath)
+			if self.fileobj:
+		           self.fileobj.close()
+			self.fileobj=file(self.pdfFilePath, 'rb')
+			self.pdf_Viewer.openPdf(self.fileobj)
 		event.Skip()
 
 
@@ -204,7 +253,8 @@ class MainFormFrame ( wx.Frame ):
 
 
 
-	def searchButtonPressed( self, event ):
+	def searchOnTextEnter( self, event ):
+	
 		if self.searchCtrl.GetValue()!='':
 			if ":" in self.searchCtrl.GetValue().lower():
 				self.key_values=self.searchCtrl.GetValue().lower().split(";")
@@ -268,7 +318,8 @@ class MainFormFrame ( wx.Frame ):
 		###
 		# new window opend
 		###
-		pdfcreateframe=pdfCreateFrame(None,self)
+
+		pdfcreateframe=pdfCreateFrame(None,self,self.flashdir,self.tempdir)
 		pdfcreateframe.Show()
 		pdfcreateframe.Maximize(True)
 		print "new newMenuItem"
@@ -281,12 +332,15 @@ class MainFormFrame ( wx.Frame ):
 		#print self.GetSize()
 		self.windowSplitter.SetSashPosition(self.GetSize()[0]/4)
 		self.windowSplitter.Unbind( wx.EVT_IDLE )
+
+	def getTempdir(self):
+		return self.tempdir
 	
 
-
+'''
 app=wx.App()
 frame=MainFormFrame(None)
 frame.Show()
 frame.Maximize(True)
 app.MainLoop()
-
+'''
