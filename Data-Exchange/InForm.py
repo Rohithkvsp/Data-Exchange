@@ -366,8 +366,8 @@ class pdfCreateFrame ( wx.Frame ):
 		
 		bSizer7.Add( self.medicalhistory, 0, wx.ALL|wx.EXPAND, 15 )
 		
-		self.medicalHistoryTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		bSizer7.Add( self.medicalHistoryTxtCtrl, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
+		self.medicalHistoryTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition,  wx.Size( 600,-1 ), wx.TE_MULTILINE )
+		bSizer7.Add( self.medicalHistoryTxtCtrl, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
 		
 		
 		bSizerScrolled.Add( bSizer7, 0, wx.EXPAND, 5 )
@@ -678,8 +678,8 @@ class pdfCreateFrame ( wx.Frame ):
 		
 		bSizer12_1.Add( self.neck, 0, wx.ALL|wx.EXPAND, 15 )
 		
-		self.neckTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		bSizer12_1.Add( self.neckTxtCtrl, 1, wx.ALL|wx.EXPAND, 5 )
+		self.neckTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 600,-1 ), wx.TE_MULTILINE )
+		bSizer12_1.Add( self.neckTxtCtrl, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		
 		bSizer12.Add( bSizer12_1, 0, wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL, 5 )
@@ -693,8 +693,8 @@ class pdfCreateFrame ( wx.Frame ):
 		
 		bSizer12_2.Add( self.chest, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 15 )
 		
-		self.chestTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		bSizer12_2.Add( self.chestTxtCtrl, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
+		self.chestTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 600,-1 ), wx.TE_MULTILINE )
+		bSizer12_2.Add( self.chestTxtCtrl, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
 		
 		
 		bSizer12.Add( bSizer12_2, 0, wx.EXPAND, 5 )
@@ -713,8 +713,8 @@ class pdfCreateFrame ( wx.Frame ):
 		
 		bSizer13_1.Add( self.cardiovascularsystem, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 15 )
 		
-		self.cardiovascularSystemTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		bSizer13_1.Add( self.cardiovascularSystemTxtCtrl, 1, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_VERTICAL, 5 )
+		self.cardiovascularSystemTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 600,-1 ), wx.TE_MULTILINE )
+		bSizer13_1.Add( self.cardiovascularSystemTxtCtrl, 0, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
 		bSizer13.Add( bSizer13_1, 0, wx.EXPAND, 5 )
@@ -941,8 +941,8 @@ class pdfCreateFrame ( wx.Frame ):
 		bSizer14_2_1 = wx.BoxSizer( wx.HORIZONTAL )
 		
 		bSizer14_2_1.SetMinSize( wx.Size( -1,90 ) ) 
-		self.vascularSystemTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		bSizer14_2_1.Add( self.vascularSystemTxtCtrl, 1, wx.ALL|wx.EXPAND, 5 )
+		self.vascularSystemTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 600,-1 ), wx.TE_MULTILINE )
+		bSizer14_2_1.Add( self.vascularSystemTxtCtrl, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		
 		bSizer14_2.Add( bSizer14_2_1, 1, wx.EXPAND, 5 )
@@ -950,8 +950,8 @@ class pdfCreateFrame ( wx.Frame ):
 		bSizer14_2_2 = wx.BoxSizer( wx.HORIZONTAL )
 		
 		bSizer14_2_2.SetMinSize( wx.Size( -1,-90 ) ) 
-		self.gastroIntestinalTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		bSizer14_2_2.Add( self.gastroIntestinalTxtCtrl, 1, wx.ALL|wx.EXPAND, 5 )
+		self.gastroIntestinalTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 600,-1 ), wx.TE_MULTILINE )
+		bSizer14_2_2.Add( self.gastroIntestinalTxtCtrl, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		
 		bSizer14_2.Add( bSizer14_2_2, 1, wx.EXPAND, 5 )
@@ -959,8 +959,8 @@ class pdfCreateFrame ( wx.Frame ):
 		bSizer14_2_3 = wx.BoxSizer( wx.VERTICAL )
 		
 		bSizer14_2_3.SetMinSize( wx.Size( -1,90 ) ) 
-		self.genitourinaryTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		bSizer14_2_3.Add( self.genitourinaryTxtCtrl, 1, wx.ALL|wx.EXPAND, 5 )
+		self.genitourinaryTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 600,-1 ), wx.TE_MULTILINE )
+		bSizer14_2_3.Add( self.genitourinaryTxtCtrl, 1, wx.ALL, 5 )
 		
 		
 		bSizer14_2.Add( bSizer14_2_3, 1, wx.EXPAND, 5 )
@@ -968,8 +968,8 @@ class pdfCreateFrame ( wx.Frame ):
 		bSizer14_2_4 = wx.BoxSizer( wx.VERTICAL )
 		
 		bSizer14_2_4.SetMinSize( wx.Size( -1,90 ) ) 
-		self.herniaTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		bSizer14_2_4.Add( self.herniaTxtCtrl, 1, wx.ALL|wx.EXPAND, 5 )
+		self.herniaTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 600,-1 ), wx.TE_MULTILINE )
+		bSizer14_2_4.Add( self.herniaTxtCtrl, 1, wx.ALL, 5 )
 		
 		
 		bSizer14_2.Add( bSizer14_2_4, 1, wx.EXPAND, 5 )
@@ -977,8 +977,8 @@ class pdfCreateFrame ( wx.Frame ):
 		bSizer14_2_5 = wx.BoxSizer( wx.VERTICAL )
 		
 		bSizer14_2_5.SetMinSize( wx.Size( -1,90 ) ) 
-		self.musculoskeletalTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		bSizer14_2_5.Add( self.musculoskeletalTxtCtrl, 1, wx.ALL|wx.EXPAND, 5 )
+		self.musculoskeletalTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 600,-1 ), wx.TE_MULTILINE )
+		bSizer14_2_5.Add( self.musculoskeletalTxtCtrl, 1, wx.ALL, 5 )
 		
 		
 		bSizer14_2.Add( bSizer14_2_5, 1, wx.EXPAND, 5 )
@@ -986,8 +986,8 @@ class pdfCreateFrame ( wx.Frame ):
 		bSizer14_2_6 = wx.BoxSizer( wx.VERTICAL )
 		
 		bSizer14_2_6.SetMinSize( wx.Size( -1,90 ) ) 
-		self.neurologicalTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		bSizer14_2_6.Add( self.neurologicalTxtCtrl, 1, wx.ALL|wx.EXPAND, 5 )
+		self.neurologicalTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 600,-1 ), wx.TE_MULTILINE )
+		bSizer14_2_6.Add( self.neurologicalTxtCtrl, 1, wx.ALL, 5 )
 		
 		
 		bSizer14_2.Add( bSizer14_2_6, 1, wx.EXPAND, 5 )
@@ -995,8 +995,8 @@ class pdfCreateFrame ( wx.Frame ):
 		bSizer14_2_7 = wx.BoxSizer( wx.VERTICAL )
 		
 		bSizer14_2_7.SetMinSize( wx.Size( -1,90 ) ) 
-		self.skinTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		bSizer14_2_7.Add( self.skinTxtCtrl, 1, wx.ALL|wx.EXPAND, 5 )
+		self.skinTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 600,-1 ), wx.TE_MULTILINE )
+		bSizer14_2_7.Add( self.skinTxtCtrl, 1, wx.ALL, 5 )
 		
 		
 		bSizer14_2.Add( bSizer14_2_7, 1, wx.EXPAND, 5 )
@@ -1004,8 +1004,8 @@ class pdfCreateFrame ( wx.Frame ):
 		bSizer14_2_8 = wx.BoxSizer( wx.VERTICAL )
 		
 		bSizer14_2_8.SetMinSize( wx.Size( -1,90 ) ) 
-		self.estimateofMentalConditionTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		bSizer14_2_8.Add( self.estimateofMentalConditionTxtCtrl, 1, wx.ALL|wx.EXPAND, 5 )
+		self.estimateofMentalConditionTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 600,-1 ), wx.TE_MULTILINE )
+		bSizer14_2_8.Add( self.estimateofMentalConditionTxtCtrl, 1, wx.ALL, 5 )
 		
 		
 		bSizer14_2.Add( bSizer14_2_8, 1, wx.EXPAND, 5 )
@@ -1013,8 +1013,8 @@ class pdfCreateFrame ( wx.Frame ):
 		bSizer14_2_9 = wx.BoxSizer( wx.VERTICAL )
 		
 		bSizer14_2_9.SetMinSize( wx.Size( -1,90 ) ) 
-		self.diagnosisTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		bSizer14_2_9.Add( self.diagnosisTxtCtrl, 1, wx.ALL|wx.EXPAND, 5 )
+		self.diagnosisTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 600,-1 ), wx.TE_MULTILINE )
+		bSizer14_2_9.Add( self.diagnosisTxtCtrl, 1, wx.ALL, 5 )
 		
 		
 		bSizer14_2.Add( bSizer14_2_9, 1, wx.EXPAND, 5 )
@@ -1022,8 +1022,8 @@ class pdfCreateFrame ( wx.Frame ):
 		bSizer14_2_10 = wx.BoxSizer( wx.VERTICAL )
 		
 		bSizer14_2_10.SetMinSize( wx.Size( -1,90 ) ) 
-		self.prognosisTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		bSizer14_2_10.Add( self.prognosisTxtCtrl, 1, wx.ALL|wx.EXPAND, 5 )
+		self.prognosisTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 600,-1 ), wx.TE_MULTILINE )
+		bSizer14_2_10.Add( self.prognosisTxtCtrl, 1, wx.ALL, 5 )
 		
 		
 		bSizer14_2.Add( bSizer14_2_10, 1, wx.EXPAND, 5 )
@@ -1031,8 +1031,8 @@ class pdfCreateFrame ( wx.Frame ):
 		bSizer14_2_11 = wx.BoxSizer( wx.VERTICAL )
 		
 		bSizer14_2_11.SetMinSize( wx.Size( -1,90 ) ) 
-		self.vacinationTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		bSizer14_2_11.Add( self.vacinationTxtCtrl, 1, wx.ALL|wx.EXPAND, 5 )
+		self.vacinationTxtCtrl = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 600,-1 ), wx.TE_MULTILINE )
+		bSizer14_2_11.Add( self.vacinationTxtCtrl, 1, wx.ALL, 5 )
 		
 		
 		bSizer14_2.Add( bSizer14_2_11, 1, wx.EXPAND, 5 )
@@ -1319,4 +1319,5 @@ class pdfCreateFrame ( wx.Frame ):
 			self.showMesssage("PDF Not Inserted")
 		print self.dataList
 		event.Skip()
+
 
